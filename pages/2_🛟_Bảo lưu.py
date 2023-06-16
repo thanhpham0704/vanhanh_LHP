@@ -8,7 +8,7 @@ from pathlib import Path
 import pickle
 import streamlit_authenticator as stauth
 chi_nhanh = 'Lê Hồng Phong'
-chi_nhanh_num = 3
+chi_nhanh_num = 5
 
 page_title = "Bảo lưu"
 page_icon = "🛟"
@@ -208,3 +208,17 @@ if authentication_status:
     st.dataframe(
         df[['hvbl_id', 'Chi nhánh', 'Họ Tên', 'Còn lại',
             'Tổng bảo lưu', 'Tổng gia hạn', 'Lý do', 'hv_link']].set_index("hvbl_id"), use_container_width=True)
+    import io
+    buffer = io.BytesIO()
+    with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+        # Write each dataframe to a different worksheet.
+        df.merge(hocvien[['hv_id', 'hv_phone']], on='hv_id').to_excel(
+            writer, sheet_name='Sheet1')
+        # Close the Pandas Excel writer and output the Excel file to the buffer
+        writer.save()
+        st.download_button(
+            label="Download danh sách bảo lưu worksheets",
+            data=buffer,
+            file_name="baoluu.xlsx",
+            mime="application/vnd.ms-excel"
+        )

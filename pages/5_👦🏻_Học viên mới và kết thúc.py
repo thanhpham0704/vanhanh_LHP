@@ -9,7 +9,7 @@ import pickle
 import streamlit_authenticator as stauth
 import plotly.graph_objects as go
 chi_nhanh = 'Lê Hồng Phong'
-chi_nhanh_num = 2
+chi_nhanh_num = 5
 
 page_title = "Học viên mới và kết thúc"
 page_icon = "👦🏻"

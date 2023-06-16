@@ -362,6 +362,8 @@ if authentication_status:
         'https://vietop.tech/api/get_data/orders').query("deleted_at.isnull()")
     hocvien = collect_data(
         'https://vietop.tech/api/get_data/hocvien').query("hv_id != 737 and deleted_at.isnull()")
+    lophoc_schedules = collect_data(
+        'https://vietop.tech/api/get_data/lophoc_schedules')
     # hv đang họccd Au
     hocvien_danghoc = hocvien.merge(orders, on='hv_id')\
         .query("ketoan_active == 1")\
@@ -546,10 +548,16 @@ if authentication_status:
 
     gv_thucthu_gv = gv_thucthu_gv.merge(salary, left_on='id', right_on='id_gg')
 
-    # Fulltime
     # Only show teacher in coso 5
-    df = gv_thucthu_gv.merge(users.query('vietop_dept == @chi_nhanh_num')[
-        ['id']], left_on='id_gg_x', right_on='id', how='inner')
+    df = gv_thucthu_gv.copy()
+    df_schedule = lophoc_schedules[[
+        'lop_id', 'teacher_id']].drop_duplicates('lop_id')
+    df_schedule = lophoc[['lop_id', 'lop_cn']].merge(df_schedule, on='lop_id')
+    df_schedule = df_schedule.query('lop_cn == @chi_nhanh_num')
+    df_schedule = df_schedule.drop_duplicates("teacher_id")
+    df = df.merge(df_schedule[['teacher_id']],
+                  left_on='id_gg_x', right_on='teacher_id')
+    # Fulltime
     df1 = df[df["working_status"] == "Fulltime"].sort_values(
         by="percent", ascending=True)
     df1['fullname'] = df1['fullname'] + " (" + df['level'] + ")"
