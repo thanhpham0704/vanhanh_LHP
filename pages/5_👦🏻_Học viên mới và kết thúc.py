@@ -8,6 +8,8 @@ from pathlib import Path
 import pickle
 import streamlit_authenticator as stauth
 import plotly.graph_objects as go
+chi_nhanh = 'Lê Hồng Phong'
+chi_nhanh_num = 2
 
 page_title = "Học viên mới và kết thúc"
 page_icon = "👦🏻"
@@ -89,13 +91,13 @@ if authentication_status:
 
     orders = collect_data(
         'https://vietop.tech/api/get_data/orders').query("deleted_at.isnull()")
-    orders = orders.query("ketoan_coso == 5")
+    orders = orders.query("ketoan_coso == @chi_nhanh_num")
     hv_status = collect_data('https://vietop.tech/api/get_data/hv_status')
     leads = collect_data(
         'https://vietop.tech/api/get_data/leads')
     hocvien = collect_data(
         'https://vietop.tech/api/get_data/hocvien').query("hv_id != 737 and deleted_at.isna()")
-    hocvien = hocvien.query("hv_coso == 5")
+    hocvien = hocvien.query("hv_coso == @chi_nhanh_num")
     orders['date_end'] = orders['date_end'].astype('datetime64[ns]')
     orders_ketthuc = orders[['ketoan_id', 'hv_id', 'ketoan_active', 'date_end']]\
         .query('ketoan_active == 5 and date_end >= @ketoan_start_time and date_end <= @ketoan_end_time')

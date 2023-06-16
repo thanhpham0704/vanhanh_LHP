@@ -7,6 +7,8 @@ import plotly.express as px
 from pathlib import Path
 import pickle
 import streamlit_authenticator as stauth
+chi_nhanh = 'Lê Hồng Phong'
+chi_nhanh_num = 3
 
 page_title = "Bảo lưu"
 page_icon = "🛟"
@@ -81,10 +83,10 @@ if authentication_status:
 
     orders = collect_data(
         'https://vietop.tech/api/get_data/orders').query("deleted_at.isnull()")
-    orders = orders.query("ketoan_coso == 5")
+    orders = orders.query("ketoan_coso == @chi_nhanh_num")
     hocvien = collect_data(
         'https://vietop.tech/api/get_data/hocvien').query("hv_id != 737 and deleted_at.isna()")
-    hocvien = hocvien.query("hv_coso == 5")
+    hocvien = hocvien.query("hv_coso == @chi_nhanh_num")
     hocvien = get_link(hocvien)
     req = requests.get('https://vietop.tech/api/get_data/history')
     req_json = req.json()

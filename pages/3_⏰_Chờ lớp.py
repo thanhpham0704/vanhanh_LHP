@@ -6,6 +6,8 @@ import plotly.express as px
 from pathlib import Path
 import pickle
 import streamlit_authenticator as stauth
+chi_nhanh = 'Lê Hồng Phong'
+chi_nhanh_num = 5
 
 page_title = "Chờ lớp"
 page_icon = "⏰"
@@ -96,10 +98,8 @@ if authentication_status:
 
     orders = collect_data(
         'https://vietop.tech/api/get_data/orders').query("deleted_at.isnull()")
-    orders = orders.query("ketoan_coso == 5")
     hocvien = collect_data(
         'https://vietop.tech/api/get_data/hocvien').query("hv_id != 737 and deleted_at.isna()")
-    hocvien = hocvien.query("hv_coso == 5")
     hocvien = get_link(hocvien)
     molop = collect_data('https://vietop.tech/api/get_data/molop')
     molop = exclude(molop, columns_name=['id', 'created_at', 'updated_at'])
@@ -186,6 +186,8 @@ if authentication_status:
     df['Tháng tạo'] = df['Ngày tạo'].dt.month
     df['Năm tạo'] = df['Ngày tạo'].dt.year
     df['created_at'] = df['Ngày tạo'].dt.strftime('%m-%Y')
+    # Filter for Le Hong Phongr
+    df = df.query("`Chi nhánh` == @chi_nhanh_num")
     df = rename_lop(df, 'Chi nhánh')
     # df = df.groupby(['Năm tạo', 'Tháng tạo', 'created_at',
     #                 'PDK2', 'Phan_loai', 'free'], as_index=False).size()
@@ -222,9 +224,7 @@ if authentication_status:
         fig = px.bar(fig.reset_index(), x='Số học viên', y='created_at',
                      color='PDK2', text='Số học viên')
         fig.update_traces(texttemplate='%{text:.2s}', textposition='outside')
-        fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
-                          height=1000,
-                          width=800)
+        fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
 
         st.dataframe(tonghop.style.background_gradient().set_precision(0),
                      use_container_width=True)
@@ -234,6 +234,7 @@ if authentication_status:
             f"Phân bổ học viên chờ lớp theo tháng {phanloai}")
         st.plotly_chart(fig, use_container_width=True)
         st.subheader(f"Chi tiết học viên {phanloai}")
+        df = df.reset_index(drop=True)
         st.dataframe(df.loc[:, ['Ngày tạo', 'Chi nhánh', 'fullname', 'Đầu vào overall', 'Điểm tư vấn', 'cam kết', 'Học phí', 'Đã thu',
                                 'Thực giờ', 'Tổng giờ khoá học', 'Tiền/giờ', 'Chi tiết', 'Tư vấn viên', 'kh_ten', 'Phan_loai', 'PDK2', 'free', 'hv_link']], use_container_width=True)
         import io
@@ -290,6 +291,7 @@ if authentication_status:
             f"Phân bổ học viên chờ lớp theo tháng {phanloai}")
         st.plotly_chart(fig)
         st.subheader(f"Chi tiết học viên {phanloai}")
+        df = df.reset_index(drop=True)
         st.dataframe(df.loc[:, ['Ngày tạo', 'Chi nhánh', 'fullname', 'Đầu vào overall', 'Điểm tư vấn', 'cam kết', 'Học phí', 'Đã thu',
                                 'Thực giờ', 'Tổng giờ khoá học', 'Tiền/giờ', 'Chi tiết', 'Tư vấn viên', 'kh_ten', 'Phan_loai', 'PDK2', 'free', 'hv_link']], use_container_width=True)
         import io

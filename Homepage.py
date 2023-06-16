@@ -8,6 +8,13 @@ import pickle
 import streamlit_authenticator as stauth
 import numpy as np
 import calendar
+yellow = '#ffc107'
+green = '#07a203'
+pink = '#e700aa'
+blue = '#2196f3'
+chi_nhanh = 'Lê Hồng Phong'
+chi_nhanh_num = 5
+chi_nhanh_color = pink
 
 # names = ["Phạm Tấn Thành", "Phạm Minh Tâm", "Vận hành", "Kinh doanh", "SOL"]
 # usernames = ["thanhpham", "tampham",
@@ -247,7 +254,6 @@ if authentication_status:
 
     # "---------------" Lương overtime của giáo viên
     lophoc = collect_data('https://vietop.tech/api/get_data/lophoc')
-    lophoc = lophoc.query("lop_cn == 5")
     diemdanh = gv_diemdanh.merge(users[['fullname', 'id']], left_on='giaovien', right_on='id', how='inner')\
         .sort_values("created_at", ascending=False)
     # diemdanh['cahoc'].replace({0: 'không học', 1: 'ca1', 2: 'ca2', 3: 'ca3', 4:'ca4', 5:'ca5', 6:'ca6', 7:'ca 1.5 giờ', 8: 'ca 2.5 giờ', 9: 'ca 3.0 giờ', 10: 'ca 1 giờ', 11: 'ca 1.75 giờ', 12: 'ca 2 giờ'}, inplace = True)
@@ -349,7 +355,6 @@ if authentication_status:
         salary_gv_dt['salary_ngay_cong_divided'], 2)
     salary_gv_dt = salary_gv_dt.sort_values(
         "salary_ngay_cong_divided", ascending=False)
-    salary_gv_dt = salary_gv_dt.query("lop_cn == 5")
 
     # ----------------------# Thực thu
 
@@ -357,7 +362,6 @@ if authentication_status:
         'https://vietop.tech/api/get_data/orders').query("deleted_at.isnull()")
     hocvien = collect_data(
         'https://vietop.tech/api/get_data/hocvien').query("hv_id != 737 and deleted_at.isnull()")
-    hocvien = hocvien.query('hv_coso == 5')
     # hv đang họccd Au
     hocvien_danghoc = hocvien.merge(orders, on='hv_id')\
         .query("ketoan_active == 1")\
@@ -441,15 +445,18 @@ if authentication_status:
             {1: "Hoa Cúc", 2: "Gò Dầu", 3: "Lê Quang Định", 5: "Lê Hồng Phong"})
         return df
     thucthu_diemdanh_ngay = thucthu_time(thucthu, 'date_created')
+    thucthu_diemdanh_ngay = thucthu_diemdanh_ngay.query('lop_cn == @chi_nhanh')
     thucthu_diemdanh_ngay = thucthu_diemdanh_ngay.pivot(
         index='date_created', columns='lop_cn', values='price')
     thucthu_diemdanh_month = thucthu_time(thucthu_all, 'date_created_month')
+    thucthu_diemdanh_month = thucthu_diemdanh_month.query(
+        "lop_cn == @chi_nhanh")
     # Thực thu điểm danh theo ngày và tháng
     fig9 = px.bar(thucthu_diemdanh_ngay, x=thucthu_diemdanh_ngay.index, y=thucthu_diemdanh_ngay.columns, barmode='stack',
-                  color_discrete_sequence=['#07a203', '#ffc107', '#e700aa', '#2196f3'])
+                  color_discrete_sequence=[chi_nhanh_color])
 
     fig10 = px.bar(thucthu_diemdanh_month, x="date_created_month",
-                   y="price", color="lop_cn", barmode="group", color_discrete_sequence=['#ffc107', '#07a203', '#2196f3', '#e700aa'], text="price")
+                   y="price", color="lop_cn", barmode="group", color_discrete_sequence=[chi_nhanh_color], text="price")
     # update the chart layout
     fig9.update_layout(title='Thực thu điểm danh theo ngày',
                        xaxis_title='Ngày', yaxis_title='Thực thu điểm danh')
@@ -482,11 +489,14 @@ if authentication_status:
         salary_thucthu.price * 100
     salary_thucthu['percent'] = round(
         salary_thucthu['percent'], 2)
+
     salary_thucthu = rename_lop(
         salary_thucthu, 'lop_cn')
+    salary_thucthu = salary_thucthu.query("lop_cn == @chi_nhanh")
 
     salary_thucthu.columns = ['Chi nhánh', 'Tổng lương ngày công',
                               'Tổng lương giờ công', 'Tổng lương giáo viên', 'Thực thu điểm danh', 'Tổng lương / thực thu']
+
     # "_______________"
     # Create a barplot for Tỷ lệ tổng lương / thực thu theo chi nhánh
     fig2 = plotly_chart(salary_thucthu, 'Tổng lương / thực thu', 'Chi nhánh', salary_thucthu["Tổng lương / thực thu"].apply(
@@ -537,7 +547,9 @@ if authentication_status:
     gv_thucthu_gv = gv_thucthu_gv.merge(salary, left_on='id', right_on='id_gg')
 
     # Fulltime
-    df = gv_thucthu_gv
+    # Only show teacher in coso 5
+    df = gv_thucthu_gv.merge(users.query('vietop_dept == @chi_nhanh_num')[
+        ['id']], left_on='id_gg_x', right_on='id', how='inner')
     df1 = df[df["working_status"] == "Fulltime"].sort_values(
         by="percent", ascending=True)
     df1['fullname'] = df1['fullname'] + " (" + df['level'] + ")"
@@ -628,8 +640,8 @@ if authentication_status:
     overtime_salary['out_div_total'] = overtime_salary['salary_gio_cong'] / \
         (overtime_salary['salary_ngay_cong'] +
          overtime_salary['salary_gio_cong'])
-    overtime_salary = overtime_salary[[
-        'Họ và tên', 'salary_ngay_cong', 'salary_gio_cong', 'out_div_total']]
+    overtime_salary = overtime_salary[['id_gg',
+                                       'Họ và tên', 'salary_ngay_cong', 'salary_gio_cong', 'out_div_total']]
     overtime_salary['out_div_total'] = round(
         overtime_salary['out_div_total'] * 100, 2)
     overtime_salary_fulltime = overtime_salary.query("salary_ngay_cong != 0")
@@ -673,6 +685,8 @@ if authentication_status:
     st.plotly_chart(fig2, use_container_width=True)
     st.subheader("Các loại thực thu theo chi nhánh")
     # define a function
+    thucthu_hocvien_lop = thucthu_hocvien_lop.query(
+        "lop_cn == @chi_nhanh")
 
     @ st.cache_data()
     def thousands_divider(df, col):
@@ -707,7 +721,8 @@ if authentication_status:
     right_column.plotly_chart(fig3_1, use_container_width=True)
 
     ""
-
+    overtime_salary_fulltime = overtime_salary_fulltime.merge(users.query(
+        "vietop_dept == @chi_nhanh_num")[['id']], left_on='id_gg', right_on='id', how='inner')
     fig4 = plotly_chart(overtime_salary_fulltime[['Họ và tên', 'out_div_total']].sort_values(
         "out_div_total", ascending=True), "Họ và tên", 'out_div_total', 'out_div_total',
         "Tỷ lệ lương ngoài giờ / trong giờ của giáo viên fulltime", '', 'Tỷ lệ')
