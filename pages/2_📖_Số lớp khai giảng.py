@@ -132,7 +132,7 @@ if authentication_status:
         # Add thousand separators to the text label
         texttemplate='%{text:,.0f}',
         textposition='inside')  # Show the text label inside the bars
-    st.subheader("Số lớp khai giảng theo chi nhánh")
+    # st.subheader("Số lớp khai giảng theo chi nhánh")
     st.plotly_chart(fig1, use_container_width=True)
     df = df.set_index("lop_id")
     "---"
