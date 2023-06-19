@@ -16,9 +16,12 @@ chi_nhanh = 'Lê Hồng Phong'
 chi_nhanh_num = 5
 chi_nhanh_color = pink
 
-# names = ["Phạm Tấn Thành", "Phạm Minh Tâm", "Vận hành", "Kinh doanh", "SOL"]
+# names = ["Phạm Tấn Thành", "Phạm Minh Tâm", "Vận hành", "Kinh doanh",
+#          "Gò Dầu", "Lê Hồng Phong", "Lê Quang Định", "Hoa Cúc"]
 # usernames = ["thanhpham", "tampham",
-#  "vietopvanhanh", 'vietopkinhdoanh', 'vietop_sol']
+#              "vietopvanhanh", 'vietopkinhdoanh', "vietop_godau", "vietop_lehongphong", "vietop_lequangdinh", "vietop_hoacuc"]
+# passwords = ['phamtanthanh0704', 'tampham1234',
+#              'vanhanh2023', 'kinhdoanh_2023', 'vietop_godau_8593', 'vietop_lehongphong_3246', 'vietop_lequangdinh_0978', 'vietop_hoacuc_5803']
 
 
 # hashed_passwords = stauth.Hasher(passwords).generate()
@@ -27,14 +30,18 @@ chi_nhanh_color = pink
 # with file_path.open("wb") as file:
 #     pickle.dump(hashed_passwords, file)
 
+
 page_title = "Lương và thực thu chi nhánh Lê Hồng Phong"
 page_icon = ":chart_with_upwards_trend:"
 layout = "wide"
 st.set_page_config(page_title=page_title, page_icon=page_icon, layout=layout)
 
 # ----------------------------------------
-names = ["Phạm Tấn Thành", "Phạm Minh Tâm", "Vận hành", "Kinh doanh"]
-usernames = ["thanhpham", "tampham", "vietopvanhanh", 'vietopkinhdoanh']
+
+names = ["Phạm Tấn Thành", "Phạm Minh Tâm", "Vận hành", "Kinh doanh",
+         "Gò Dầu", "Lê Hồng Phong", "Lê Quang Định", "Hoa Cúc"]
+usernames = ["thanhpham", "tampham",
+             "vietopvanhanh", 'vietopkinhdoanh', "vietop_godau", "vietop_lehongphong", "vietop_lequangdinh", "vietop_hoacuc"]
 
 
 # Load hashed password
