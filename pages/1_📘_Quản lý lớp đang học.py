@@ -129,9 +129,9 @@ if authentication_status:
         # Increase font size for all text in the plot)
         xaxis_title='', yaxis_title='Trung bình học viên', showlegend=True, font=dict(size=20), xaxis={'categoryorder': 'total descending'})
     fig1.update_traces(
-        hovertemplate="Trung bình học viên: %{y:,.0f}<extra></extra>",
+        hovertemplate="Trung bình học viên: %{y:,.1f}<extra></extra>",
         # Add thousand separators to the text label
-        texttemplate='%{text:,.0f}',
+        texttemplate='%{text:,.1f}',
         textposition='inside')  # Show the text label inside the bars
 
     # Get the detail spreadsheet
@@ -165,7 +165,7 @@ if authentication_status:
     st.dataframe(df, use_container_width=True)
     st.subheader("Trung bình số lượng học viên trong từng loại lớp học")
     st.plotly_chart(fig1, use_container_width=True)
-    st.subheader("Phân phối số lượng học viên trong các lớp nhóm")
+    st.subheader("Histogram sỉ số lớp")
     st.plotly_chart(fig2, use_container_width=True)
     st.markdown("---")
     st.subheader("Chi tiết lớp đang học")
